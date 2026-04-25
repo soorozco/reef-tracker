@@ -1,0 +1,224 @@
+/* Reef Tracker — estilos.
+   Optimizado para Safari 9 (iOS 9.3.5): flexbox con prefijos -webkit-,
+   sin CSS Grid moderno, sin gap en flex (usar márgenes en su lugar). */
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #0a1d2e;
+  color: #e8f1f8;
+  font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  min-height: 100vh;
+}
+
+/* ---------- Header ---------- */
+header {
+  background: #051421;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding: 12px 16px;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+header h1 {
+  margin: 0 0 10px 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #1fb8c4;
+  letter-spacing: 0.5px;
+}
+
+nav {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-wrap: wrap;
+          flex-wrap: wrap;
+}
+
+.tab {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.15);
+  color: #8aa3b8;
+  padding: 8px 12px;
+  margin: 2px 4px 2px 0;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+  -webkit-appearance: none;
+}
+
+.tab.active {
+  background: #1fb8c4;
+  color: #051421;
+  border-color: #1fb8c4;
+  font-weight: 600;
+}
+
+/* ---------- Layout ---------- */
+main {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.view { display: none; }
+.view.active { display: block; }
+
+/* ---------- Card ---------- */
+.card {
+  background: #122a40;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.card h2 { margin: 0 0 12px 0; font-size: 16px; color: #e8f1f8; }
+
+main h2 { font-size: 16px; margin: 16px 0 8px 0; color: #e8f1f8; }
+
+.muted { color: #8aa3b8; font-size: 14px; margin: 0; }
+
+/* ---------- Form ---------- */
+.grid {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-wrap: wrap;
+          flex-wrap: wrap;
+  margin: 0 -5px;
+}
+
+.grid label {
+  -webkit-flex: 1 1 130px;
+          flex: 1 1 130px;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-direction: column;
+          flex-direction: column;
+  font-size: 12px;
+  color: #8aa3b8;
+  margin: 0 5px 10px 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+label.full {
+  display: block;
+  font-size: 12px;
+  color: #8aa3b8;
+  margin: 6px 0 0 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+input, textarea {
+  width: 100%;
+  padding: 10px 12px;
+  margin-top: 4px;
+  background: rgba(0,0,0,0.25);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 6px;
+  color: #e8f1f8;
+  font-size: 16px;
+  font-family: inherit;
+  -webkit-appearance: none;
+}
+
+input:focus, textarea:focus {
+  outline: none;
+  border-color: #1fb8c4;
+}
+
+textarea { resize: vertical; min-height: 50px; }
+
+button[type="submit"] {
+  background: #1fb8c4;
+  color: #051421;
+  border: none;
+  padding: 12px 18px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-top: 14px;
+  width: 100%;
+}
+
+button[type="submit"]:active {
+  background: #17a3ae;
+}
+
+/* ---------- Lista ---------- */
+.list { display: block; }
+
+.list .item {
+  background: #122a40;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+}
+
+.item-date {
+  font-size: 12px;
+  color: #8aa3b8;
+  margin-bottom: 4px;
+}
+
+.item-values {
+  font-size: 14px;
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+.item-notes {
+  margin-top: 6px;
+  font-size: 13px;
+  color: #8aa3b8;
+  font-style: italic;
+}
+
+/* ---------- Toast ---------- */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  -webkit-transform: translateX(-50%) translateY(120px);
+          transform: translateX(-50%) translateY(120px);
+  background: #122a40;
+  color: #e8f1f8;
+  padding: 12px 20px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.15);
+  -webkit-transition: -webkit-transform 0.3s ease-out;
+          transition: transform 0.3s ease-out;
+  z-index: 100;
+  font-size: 14px;
+  max-width: 90%;
+  text-align: center;
+}
+
+.toast.show {
+  -webkit-transform: translateX(-50%) translateY(0);
+          transform: translateX(-50%) translateY(0);
+}
+
+/* ---------- Tablet/desktop ---------- */
+@media (min-width: 600px) {
+  button[type="submit"] { width: auto; min-width: 200px; }
+  header h1 { font-size: 24px; }
+}

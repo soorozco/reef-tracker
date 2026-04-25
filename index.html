@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Reef Tracker">
+  <title>Reef Tracker</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>Reef Tracker</h1>
+    <nav>
+      <button class="tab active" data-tab="parameters">Parámetros</button>
+      <button class="tab" data-tab="dosing">Dosificación</button>
+      <button class="tab" data-tab="solutions">Soluciones</button>
+      <button class="tab" data-tab="maintenance">Mantenimiento</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Parámetros -->
+    <section id="view-parameters" class="view active">
+      <form id="form-parameters" class="card" autocomplete="off">
+        <h2>Nueva lectura</h2>
+        <div class="grid">
+          <label>dKH (alcalinidad)<input type="number" step="0.1" name="dkh" inputmode="decimal"></label>
+          <label>Ca (mg/L)<input type="number" step="1" name="ca" inputmode="decimal"></label>
+          <label>Mg (mg/L)<input type="number" step="1" name="mg" inputmode="decimal"></label>
+          <label>NO3 (ppm)<input type="number" step="0.1" name="no3" inputmode="decimal"></label>
+          <label>PO4 (ppm)<input type="number" step="0.01" name="po4" inputmode="decimal"></label>
+          <label>Salinidad (sg)<input type="number" step="0.001" name="salinity" inputmode="decimal"></label>
+          <label>Temp (°C)<input type="number" step="0.1" name="temp_c" inputmode="decimal"></label>
+          <label>pH<input type="number" step="0.01" name="ph" inputmode="decimal"></label>
+        </div>
+        <label class="full">Notas<textarea name="notes" rows="2" placeholder="Opcional"></textarea></label>
+        <button type="submit">Guardar lectura</button>
+      </form>
+
+      <h2>Últimas lecturas</h2>
+      <div id="list-parameters" class="list">Cargando...</div>
+    </section>
+
+    <!-- Dosificación -->
+    <section id="view-dosing" class="view">
+      <div class="card">
+        <h2>Dosificación</h2>
+        <p class="muted">Próximamente: configurar los 4 canales de la bomba (producto, ml/día) y calcular dosis a partir del consumo medido.</p>
+      </div>
+    </section>
+
+    <!-- Soluciones -->
+    <section id="view-solutions" class="view">
+      <div class="card">
+        <h2>Soluciones preparadas</h2>
+        <p class="muted">Próximamente: registro de lotes (gramos de polvo Red Sea + ml de RODI) y cuándo se prepararon.</p>
+      </div>
+    </section>
+
+    <!-- Mantenimiento -->
+    <section id="view-maintenance" class="view">
+      <div class="card">
+        <h2>Mantenimiento</h2>
+        <p class="muted">Próximamente: bitácora de tareas (limpieza skimmer, cambio de agua, etc.) con checklist y recordatorios.</p>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
