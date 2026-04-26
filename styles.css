@@ -929,6 +929,136 @@ button[type="submit"]:active { background: #17a3ae; }
 
 .login-help a:active { color: #17a3ae; }
 
+/* ---------- Gráficas / Tendencias ---------- */
+.charts-grid {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-wrap: wrap;
+          flex-wrap: wrap;
+  margin: 0 -6px;
+}
+
+.chart-card {
+  -webkit-flex: 1 1 320px;
+          flex: 1 1 320px;
+  background: #122a40;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  padding: 12px;
+  margin: 0 6px 12px 6px;
+  min-width: 0;
+}
+
+.chart-header {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-justify-content: space-between;
+          justify-content: space-between;
+  -webkit-align-items: baseline;
+          align-items: baseline;
+  margin-bottom: 6px;
+}
+
+.chart-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1fb8c4;
+}
+
+.chart-last {
+  font-size: 14px;
+  font-weight: 700;
+  color: #4ec98a;
+  background: rgba(78,201,138,0.12);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.chart-last.chart-last-off {
+  color: #ffaa6e;
+  background: rgba(255,170,110,0.15);
+}
+
+.chart-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: rgba(0,0,0,0.18);
+  border-radius: 6px;
+}
+
+.chart-grid {
+  stroke: rgba(255,255,255,0.06);
+  stroke-width: 1;
+}
+
+.chart-axis-label {
+  fill: #6a7d92;
+  font-size: 10px;
+  font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.chart-y-label {
+  fill: #8aa3b8;
+  font-size: 10px;
+  font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.chart-target {
+  stroke: #8aa3b8;
+  stroke-width: 1;
+  stroke-dasharray: 4 3;
+  opacity: 0.6;
+}
+
+.chart-target-label {
+  fill: #8aa3b8;
+  font-size: 9px;
+  font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-style: italic;
+}
+
+.chart-line {
+  fill: none;
+  stroke: #1fb8c4;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.chart-point {
+  fill: #1fb8c4;
+  stroke: #122a40;
+  stroke-width: 1.5;
+}
+
+.chart-point-off {
+  fill: #ffaa6e;
+}
+
+.chart-empty {
+  fill: #6a7d92;
+  font-size: 12px;
+  font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.chart-no-data {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #6a7d92;
+  text-align: center;
+  font-style: italic;
+}
+
+.chart-meta {
+  margin-top: 4px;
+  text-align: right;
+}
+
+@media (min-width: 700px) {
+  .chart-card { -webkit-flex: 1 1 calc(50% - 12px); flex: 1 1 calc(50% - 12px); }
+}
+
 #login-btn {
   background: #1fb8c4;
   color: #051421;

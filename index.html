@@ -20,6 +20,7 @@
     </div>
     <nav>
       <button class="tab active" data-tab="parameters">Parámetros</button>
+      <button class="tab" data-tab="charts">Tendencias</button>
       <button class="tab" data-tab="dosing">Dosificación</button>
       <button class="tab" data-tab="solutions">Soluciones</button>
       <button class="tab" data-tab="maintenance">Mantenimiento</button>
@@ -48,6 +49,11 @@
 
       <h2>Últimas lecturas</h2>
       <div id="list-parameters" class="list">Cargando...</div>
+    </section>
+
+    <!-- Tendencias / Gráficas -->
+    <section id="view-charts" class="view">
+      <div id="view-charts-content"></div>
     </section>
 
     <!-- Dosificación -->
@@ -98,6 +104,8 @@
   <script src="js/view-maintenance.js"></script>
   <script src="js/view-solutions.js"></script>
   <script src="js/view-dosing.js"></script>
+  <script src="js/chart.js"></script>
+  <script src="js/view-charts.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
