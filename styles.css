@@ -902,7 +902,8 @@ button[type="submit"]:active { background: #17a3ae; }
   line-height: 1.5;
 }
 
-.login-box input[type="email"] {
+.login-box input[type="email"],
+.login-box input[type="password"] {
   width: 100%;
   padding: 12px 14px;
   background: rgba(0,0,0,0.25);
@@ -911,14 +912,22 @@ button[type="submit"]:active { background: #17a3ae; }
   color: #e8f1f8;
   font-size: 16px;
   font-family: inherit;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   -webkit-appearance: none;
 }
 
-.login-box input[type="email"]:focus {
+.login-box input[type="email"]:focus,
+.login-box input[type="password"]:focus {
   outline: none;
   border-color: #1fb8c4;
 }
+
+.login-help a {
+  color: #1fb8c4;
+  text-decoration: none;
+}
+
+.login-help a:active { color: #17a3ae; }
 
 #login-btn {
   background: #1fb8c4;

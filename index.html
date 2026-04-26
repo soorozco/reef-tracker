@@ -77,13 +77,14 @@
   <div id="login-screen" class="login-overlay" style="display:none">
     <div class="login-box">
       <h1>Reef Tracker</h1>
-      <p class="muted">Ingresa tu correo y te enviaré un link mágico para entrar. Sin contraseñas.</p>
+      <p class="muted">Inicia sesión con tu correo y contraseña.</p>
       <form id="login-form" autocomplete="on">
         <input type="email" id="login-email" name="email" placeholder="tu@email.com" required autocomplete="email">
-        <button id="login-btn" type="submit">Enviar link</button>
+        <input type="password" id="login-password" name="password" placeholder="contraseña" required autocomplete="current-password">
+        <button id="login-btn" type="submit">Entrar</button>
       </form>
       <div id="login-status" class="login-status"></div>
-      <p class="muted small login-help">¿Primera vez? El admin debe haberte invitado primero desde el dashboard de Supabase.</p>
+      <p class="muted small login-help">¿Olvidaste tu contraseña? <a href="#" id="login-magic-link">Enviar link mágico al correo</a></p>
     </div>
   </div>
 

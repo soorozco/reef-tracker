@@ -122,8 +122,10 @@
 
     var form = document.getElementById('login-form');
     var emailInput = document.getElementById('login-email');
+    var passwordInput = document.getElementById('login-password');
     var statusEl = document.getElementById('login-status');
     var btn = document.getElementById('login-btn');
+    var magicLink = document.getElementById('login-magic-link');
 
     // Pre-llenar con último email usado, si existe
     try {
@@ -131,40 +133,68 @@
       if (last) emailInput.value = last;
     } catch (e) {}
 
+    // Login con email + contraseña
     form.onsubmit = function (e) {
       e.preventDefault();
-      var email = emailInput.value.trim();
-      if (!email) {
+      var email    = emailInput.value.trim();
+      var password = passwordInput.value;
+      if (!email || !password) {
         statusEl.className = 'login-status error';
-        statusEl.textContent = 'Ingresa tu correo';
+        statusEl.textContent = 'Ingresa correo y contraseña';
         return;
       }
       btn.disabled = true;
-      btn.textContent = 'Enviando...';
+      btn.textContent = 'Entrando...';
       statusEl.className = 'login-status';
       statusEl.textContent = '';
 
-      window.AUTH.requestLogin(email).then(function () {
+      window.AUTH.signInWithPassword(email, password).then(function () {
         try { localStorage.setItem('reef-tracker.last_email', email); } catch (e) {}
-        statusEl.className = 'login-status success';
-        statusEl.innerHTML = '✓ Te envié un link a <strong>' + window.UTIL.escapeHtml(email) +
-          '</strong>. Revisa tu correo (incluye spam) y haz click. Esta pestaña ya puedes cerrarla.';
-        btn.disabled = false;
-        btn.textContent = 'Reenviar link';
+        passwordInput.value = '';
+        // Recarga para que el flujo normal de boot tome la sesión
+        window.location.reload();
       })['catch'](function (err) {
         statusEl.className = 'login-status error';
-        var msg = err.message || 'Error desconocido';
-        if (msg.toLowerCase().indexOf('signups not allowed') !== -1 ||
-            msg.toLowerCase().indexOf('not found') !== -1 ||
-            msg.toLowerCase().indexOf('signup is disabled') !== -1) {
-          statusEl.textContent = 'Este correo no tiene acceso. Pídele al admin que te invite.';
+        var msg = (err.message || '').toLowerCase();
+        if (msg.indexOf('invalid login credentials') !== -1 ||
+            msg.indexOf('invalid_grant') !== -1) {
+          statusEl.textContent = 'Correo o contraseña incorrectos';
+        } else if (msg.indexOf('email not confirmed') !== -1) {
+          statusEl.textContent = 'Correo sin confirmar. En Supabase Dashboard, marca "Auto Confirm User" o desactiva "Confirm email".';
         } else {
-          statusEl.textContent = 'Error: ' + msg;
+          statusEl.textContent = 'Error: ' + (err.message || 'desconocido');
         }
         btn.disabled = false;
-        btn.textContent = 'Enviar link';
+        btn.textContent = 'Entrar';
       });
     };
+
+    // Fallback: enviar magic link si olvidó la contraseña
+    if (magicLink) {
+      magicLink.onclick = function (e) {
+        e.preventDefault();
+        var email = emailInput.value.trim();
+        if (!email) {
+          statusEl.className = 'login-status error';
+          statusEl.textContent = 'Escribe tu correo arriba primero';
+          return;
+        }
+        magicLink.style.pointerEvents = 'none';
+        magicLink.textContent = 'Enviando...';
+        window.AUTH.requestMagicLink(email).then(function () {
+          statusEl.className = 'login-status success';
+          statusEl.innerHTML = '✓ Te envié un link a <strong>' + window.UTIL.escapeHtml(email) +
+            '</strong>. Revisa tu correo y haz click.';
+          magicLink.style.pointerEvents = 'auto';
+          magicLink.textContent = 'Reenviar link mágico';
+        })['catch'](function (err) {
+          statusEl.className = 'login-status error';
+          statusEl.textContent = 'Error: ' + (err.message || 'desconocido');
+          magicLink.style.pointerEvents = 'auto';
+          magicLink.textContent = 'Enviar link mágico al correo';
+        });
+      };
+    }
   }
 
   function hideLoginScreen() {

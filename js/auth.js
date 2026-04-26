@@ -169,10 +169,29 @@
       return (s && s.user) ? s.user.email : null;
     },
 
-    requestLogin: function (email) {
-      // shouldCreateUser=false significa que el usuario debe existir antes
-      // (creado manualmente desde el dashboard). Esto es deliberado para
-      // evitar que cualquiera se registre solo.
+    // Login con email + contraseña. El usuario debe existir en Supabase
+    // (creado manualmente desde el dashboard). La contraseña se valida en
+    // el servidor; aquí solo se envía vía HTTPS y nunca se persiste.
+    signInWithPassword: function (email, password) {
+      return authRequest('POST', '/token?grant_type=password', {
+        email: email,
+        password: password
+      }, false).then(function (resp) {
+        if (!resp || !resp.access_token) throw new Error('Respuesta inválida del servidor');
+        var session = {
+          access_token:  resp.access_token,
+          refresh_token: resp.refresh_token || null,
+          expires_at:    Math.floor(Date.now() / 1000) + (resp.expires_in || 3600),
+          token_type:    resp.token_type || 'bearer',
+          user:          resp.user || null
+        };
+        saveSession(session);
+        return session;
+      });
+    },
+
+    // Magic link (queda como fallback / "olvidé mi contraseña").
+    requestMagicLink: function (email) {
       return authRequest('POST', '/otp', {
         email: email,
         create_user: false,
