@@ -92,6 +92,7 @@
     window.VIEW_AQUARIUM.init();
     window.VIEW_MAINTENANCE.init();
     window.VIEW_SOLUTIONS.init();
+    window.VIEW_DOSING.init();
     refreshActiveView();
   }
 
@@ -146,5 +147,6 @@
     else if (name === 'aquarium') window.VIEW_AQUARIUM.refresh();
     else if (name === 'maintenance') window.VIEW_MAINTENANCE.refresh();
     else if (name === 'solutions') window.VIEW_SOLUTIONS.refresh();
+    else if (name === 'dosing') window.VIEW_DOSING.refresh();
   }
 })();
