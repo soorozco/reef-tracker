@@ -487,6 +487,131 @@ button[type="submit"]:active { background: #17a3ae; }
   font-style: italic;
 }
 
+.log-details {
+  margin-top: 4px;
+  font-size: 13px;
+  color: #c8d6e2;
+}
+
+.log-detail { display: inline-block; margin-right: 8px; }
+.log-detail strong { color: #1fb8c4; font-weight: 600; }
+
+.task-badge {
+  display: inline-block;
+  background: rgba(31,184,196,0.2);
+  color: #1fb8c4;
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 8px;
+  margin-left: 6px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+
+/* ---------- Modal genérico (captura datos al marcar hecho) ---------- */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(5,20,33,0.85);
+  z-index: 250;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 20px;
+}
+
+.modal {
+  max-width: 500px;
+  margin: 40px auto;
+  background: #122a40;
+  border: 1px solid rgba(31,184,196,0.4);
+  border-radius: 12px;
+  padding: 22px;
+}
+
+.modal h2 {
+  margin: 0 0 4px 0;
+  color: #1fb8c4;
+  font-size: 18px;
+}
+
+.modal .prompt-field {
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin: 12px 0;
+}
+
+.modal .prompt-field legend {
+  padding: 0 6px;
+  font-size: 12px;
+  color: #1fb8c4;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.cb-option {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+          align-items: center;
+  padding: 6px 0;
+  font-size: 14px;
+  color: #e8f1f8;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.cb-option input[type="checkbox"] {
+  width: auto;
+  margin: 0 10px 0 0;
+  -webkit-appearance: checkbox;
+}
+
+.cb-option span { -webkit-flex: 1; flex: 1; }
+
+.modal-actions {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-justify-content: flex-end;
+          justify-content: flex-end;
+  margin-top: 14px;
+}
+
+.modal-actions button {
+  margin-left: 8px;
+  padding: 10px 16px;
+  border-radius: 6px;
+  border: none;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-appearance: none;
+}
+
+.modal-actions button[type="submit"] {
+  background: #1fb8c4;
+  color: #051421;
+  width: auto;
+  margin-top: 0;
+}
+
+.modal-actions .btn-secondary {
+  background: transparent;
+  color: #8aa3b8;
+  border: 1px solid rgba(255,255,255,0.15);
+}
+
+.modal-error {
+  margin-top: 10px;
+  color: #e85a5a;
+  font-size: 13px;
+  text-align: right;
+}
+
 /* ---------- Tablet/desktop ---------- */
 @media (min-width: 600px) {
   button[type="submit"] { width: auto; min-width: 200px; }
