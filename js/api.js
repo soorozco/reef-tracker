@@ -80,13 +80,41 @@
       return request('POST', '/solutions', row);
     },
 
-    // ---------------- Maintenance ----------------
+    // ---------------- Maintenance log ----------------
     listMaintenance: function (aquariumId, limit) {
       var l = limit || 20;
       return request('GET', '/maintenance_log?aquarium_id=eq.' + aquariumId + '&order=performed_at.desc&limit=' + l);
     },
     insertMaintenance: function (row) {
       return request('POST', '/maintenance_log', row);
+    },
+    deleteMaintenance: function (id) {
+      return request('DELETE', '/maintenance_log?id=eq.' + id);
+    },
+
+    // ---------------- Maintenance tasks (catálogo) ----------------
+    listTasks: function (aquariumId) {
+      return request('GET', '/maintenance_tasks?aquarium_id=eq.' + aquariumId + '&order=frequency_days.asc');
+    },
+    insertTask: function (row) {
+      return request('POST', '/maintenance_tasks', row);
+    },
+    insertTasksBulk: function (rows) {
+      return request('POST', '/maintenance_tasks', rows);
+    },
+    updateTask: function (id, patch) {
+      return request('PATCH', '/maintenance_tasks?id=eq.' + id, patch);
+    },
+    deleteTask: function (id) {
+      return request('DELETE', '/maintenance_tasks?id=eq.' + id);
+    },
+    // Última fecha hecha por tarea (para todas las tareas del acuario en una sola request)
+    listLastDonePerTask: function (aquariumId) {
+      // Trae los logs con task_id no nulo, ordenados desc.
+      // El frontend agrupa por task_id y se queda con el más reciente.
+      return request('GET',
+        '/maintenance_log?aquarium_id=eq.' + aquariumId +
+        '&task_id=not.is.null&select=task_id,performed_at&order=performed_at.desc');
     }
   };
 })();

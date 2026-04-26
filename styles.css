@@ -341,8 +341,157 @@ button[type="submit"]:active { background: #17a3ae; }
 
 .product-row:last-child { border-bottom: none; }
 
+/* ---------- Mantenimiento ---------- */
+.seed-list {
+  margin: 8px 0 16px 0;
+  padding-left: 20px;
+  color: #c8d6e2;
+  font-size: 14px;
+}
+
+.seed-list li { margin-bottom: 4px; }
+
+#seed-btn,
+#form-add-task button[type="submit"],
+#form-quick-log button[type="submit"] {
+  background: #1fb8c4;
+  color: #051421;
+  border: none;
+  padding: 12px 18px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  -webkit-appearance: none;
+  width: 100%;
+}
+
+.task-row {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+          align-items: center;
+  background: rgba(0,0,0,0.15);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-left: 4px solid #8aa3b8;
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+}
+
+.task-row.task-overdue   { border-left-color: #e85a5a; }
+.task-row.task-due-soon  { border-left-color: #ffaa6e; }
+.task-row.task-ok        { border-left-color: #4ec98a; }
+.task-row.task-pending   { border-left-color: #8aa3b8; }
+
+.task-info { -webkit-flex: 1; flex: 1; min-width: 0; }
+
+.task-name {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.task-meta {
+  font-size: 12px;
+  color: #8aa3b8;
+}
+
+.task-next { font-weight: 600; }
+.task-overdue  .task-next { color: #e85a5a; }
+.task-due-soon .task-next { color: #ffaa6e; }
+.task-ok       .task-next { color: #4ec98a; }
+.task-pending  .task-next { color: #8aa3b8; }
+
+.task-actions {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+          align-items: center;
+  margin-left: 8px;
+}
+
+.btn-done {
+  background: #1fb8c4;
+  color: #051421;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-right: 6px;
+  white-space: nowrap;
+}
+
+.btn-done:active { background: #17a3ae; }
+.btn-done:disabled { opacity: 0.5; }
+
+.btn-delete-task {
+  background: transparent;
+  color: #8aa3b8;
+  border: 1px solid rgba(255,255,255,0.1);
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  font-size: 18px;
+  font-family: inherit;
+  cursor: pointer;
+  -webkit-appearance: none;
+  padding: 0;
+  line-height: 1;
+}
+
+.btn-delete-task:active {
+  background: rgba(232,90,90,0.2);
+  color: #e85a5a;
+  border-color: #e85a5a;
+}
+
+.log-row {
+  background: rgba(0,0,0,0.15);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+}
+
+.log-row-top {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-justify-content: space-between;
+          justify-content: space-between;
+  -webkit-align-items: baseline;
+          align-items: baseline;
+  margin-bottom: 2px;
+}
+
+.log-task {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.log-date {
+  font-size: 12px;
+  color: #8aa3b8;
+  white-space: nowrap;
+  margin-left: 8px;
+}
+
+.log-notes {
+  font-size: 13px;
+  color: #c8d6e2;
+  font-style: italic;
+}
+
 /* ---------- Tablet/desktop ---------- */
 @media (min-width: 600px) {
   button[type="submit"] { width: auto; min-width: 200px; }
+  #seed-btn,
+  #form-add-task button[type="submit"],
+  #form-quick-log button[type="submit"] { width: auto; min-width: 200px; }
   header h1 { font-size: 24px; }
 }
