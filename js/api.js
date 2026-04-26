@@ -60,6 +60,31 @@
     listProducts: function () {
       return request('GET', '/products?order=brand.asc,name.asc');
     },
+    insertProduct: function (row) {
+      return request('POST', '/products', row);
+    },
+    updateProduct: function (id, patch) {
+      return request('PATCH', '/products?id=eq.' + id, patch);
+    },
+    deleteProduct: function (id) {
+      return request('DELETE', '/products?id=eq.' + id);
+    },
+
+    // ---------------- Livestock ----------------
+    listLivestock: function (aquariumId, statusFilter) {
+      var q = '/livestock?aquarium_id=eq.' + aquariumId + '&order=added_at.desc';
+      if (statusFilter) q += '&status=eq.' + encodeURIComponent(statusFilter);
+      return request('GET', q);
+    },
+    insertLivestock: function (row) {
+      return request('POST', '/livestock', row);
+    },
+    updateLivestock: function (id, patch) {
+      return request('PATCH', '/livestock?id=eq.' + id, patch);
+    },
+    deleteLivestock: function (id) {
+      return request('DELETE', '/livestock?id=eq.' + id);
+    },
 
     // ---------------- Dosing channels ----------------
     listChannels: function (aquariumId) {

@@ -110,6 +110,7 @@
     window.VIEW_SOLUTIONS.init();
     window.VIEW_DOSING.init();
     window.VIEW_CHARTS.init();
+    window.VIEW_LIVESTOCK.init();
     refreshActiveView();
   }
 
@@ -283,5 +284,6 @@
     else if (name === 'solutions') window.VIEW_SOLUTIONS.refresh();
     else if (name === 'dosing') window.VIEW_DOSING.refresh();
     else if (name === 'charts') window.VIEW_CHARTS.refresh();
+    else if (name === 'livestock') window.VIEW_LIVESTOCK.refresh();
   }
 })();

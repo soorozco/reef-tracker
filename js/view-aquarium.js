@@ -26,6 +26,7 @@
 
     bindAquariumForm(aquarium);
     loadAndBindChannels(aquarium);
+    bindProductsHandlers(aquarium);
   }
 
   // ----------------------------------------------------------
@@ -166,28 +167,182 @@
   }
 
   // ----------------------------------------------------------
-  // Card: catálogo de productos (read-only por ahora)
+  // Card: catálogo de productos (editable)
   // ----------------------------------------------------------
   function renderProductsCard() {
-    var products = window.STATE.products;
-    if (!products || products.length === 0) {
-      return '<div class="card"><h2>Catálogo de productos</h2><p class="muted">Sin productos.</p></div>';
-    }
-    var rows = products.map(function (p) {
-      var effects = [];
-      if (Number(p.affects_dkh_per_ml_per_100l) > 0) effects.push('+' + p.affects_dkh_per_ml_per_100l + ' dKH');
-      if (Number(p.affects_ca_per_ml_per_100l)  > 0) effects.push('+' + p.affects_ca_per_ml_per_100l  + ' Ca');
-      if (Number(p.affects_mg_per_ml_per_100l)  > 0) effects.push('+' + p.affects_mg_per_ml_per_100l  + ' Mg');
-      var efectoTxt = effects.length ? effects.join(' / ') + ' (1 ml/100 L)' : '—';
-      return '<div class="product-row">' +
-        '<div><strong>' + window.UTIL.escapeHtml(p.brand) + '</strong> — ' + window.UTIL.escapeHtml(p.name) + '</div>' +
-        '<div class="muted small">' + efectoTxt + '</div>' +
-      '</div>';
-    }).join('');
+    var products = window.STATE.products || [];
+    var rows = products.length === 0
+      ? '<p class="muted">Sin productos en el catálogo.</p>'
+      : products.map(renderProductRow).join('');
+
     return '<div class="card">' +
       '<h2>Catálogo de productos</h2>' +
-      '<p class="muted small">Concentraciones cuando se prepara según receta del fabricante.</p>' +
+      '<p class="muted small">Concentraciones cuando se prepara según receta del fabricante (1 ml de la solución preparada en 100 L de agua).</p>' +
       rows +
+      renderAddProductForm() +
     '</div>';
+  }
+
+  function renderProductRow(p) {
+    var effects = [];
+    if (Number(p.affects_dkh_per_ml_per_100l) > 0) effects.push('+' + p.affects_dkh_per_ml_per_100l + ' dKH');
+    if (Number(p.affects_ca_per_ml_per_100l)  > 0) effects.push('+' + p.affects_ca_per_ml_per_100l  + ' Ca');
+    if (Number(p.affects_mg_per_ml_per_100l)  > 0) effects.push('+' + p.affects_mg_per_ml_per_100l  + ' Mg');
+    var efectoTxt = effects.length ? effects.join(' / ') + ' (1 ml/100 L)' : '—';
+
+    return '<div class="product-row" data-product-id="' + p.id + '">' +
+      '<div class="product-info">' +
+        '<div><strong>' + window.UTIL.escapeHtml(p.brand || '') + '</strong> — ' + window.UTIL.escapeHtml(p.name) + '</div>' +
+        '<div class="muted small">' + efectoTxt + '</div>' +
+      '</div>' +
+      '<div class="product-actions">' +
+        '<button class="btn-edit-product" data-id="' + p.id + '" type="button" title="Editar">✎</button>' +
+        '<button class="btn-delete-product" data-id="' + p.id + '" type="button" title="Eliminar">×</button>' +
+      '</div>' +
+    '</div>';
+  }
+
+  function renderAddProductForm() {
+    return '<details class="add-product-section">' +
+      '<summary>+ Añadir producto al catálogo</summary>' +
+      '<form id="form-add-product" autocomplete="off">' +
+        '<div class="grid">' +
+          '<label>Marca<input type="text" name="brand" placeholder="Ej: Red Sea"></label>' +
+          '<label>Nombre<input type="text" name="name" required placeholder="Ej: Foundation A"></label>' +
+        '</div>' +
+        '<p class="muted small">Concentración en ppm que sube 1 ml de tu solución preparada en 100 L de agua. Deja en 0 los parámetros que el producto no afecta.</p>' +
+        '<div class="grid">' +
+          '<label>+ dKH / ml / 100 L<input type="number" step="0.001" name="affects_dkh_per_ml_per_100l" value="0" inputmode="decimal"></label>' +
+          '<label>+ Ca / ml / 100 L<input type="number" step="0.01" name="affects_ca_per_ml_per_100l" value="0" inputmode="decimal"></label>' +
+          '<label>+ Mg / ml / 100 L<input type="number" step="0.01" name="affects_mg_per_ml_per_100l" value="0" inputmode="decimal"></label>' +
+        '</div>' +
+        '<label class="full">Modo<select name="default_mode">' +
+          '<option value="daily">Diario</option>' +
+          '<option value="on_demand">Eventual</option>' +
+        '</select></label>' +
+        '<label class="full">Notas<textarea name="notes" rows="2"></textarea></label>' +
+        '<button type="submit">Añadir producto</button>' +
+      '</form>' +
+    '</details>';
+  }
+
+  function bindProductsHandlers(aquarium) {
+    // Editar producto
+    Array.prototype.forEach.call(document.querySelectorAll('.btn-edit-product'), function (btn) {
+      btn.addEventListener('click', function () {
+        var id = parseInt(btn.getAttribute('data-id'), 10);
+        var product = window.STATE.findProductById(id);
+        if (product) openEditProductModal(product, aquarium);
+      });
+    });
+
+    // Eliminar producto
+    Array.prototype.forEach.call(document.querySelectorAll('.btn-delete-product'), function (btn) {
+      btn.addEventListener('click', function () {
+        var id = parseInt(btn.getAttribute('data-id'), 10);
+        var product = window.STATE.findProductById(id);
+        if (!product) return;
+        if (!confirm('¿Eliminar "' + product.name + '" del catálogo? Los canales que lo usen quedarán sin producto asignado.')) return;
+        window.API.deleteProduct(id).then(function () {
+          window.UTIL.toast('Producto eliminado');
+          reloadProductsAndRender();
+        })['catch'](function (err) {
+          window.UTIL.toast('Error: ' + err.message);
+        });
+      });
+    });
+
+    // Añadir producto
+    var addForm = document.getElementById('form-add-product');
+    if (addForm) {
+      addForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var data = window.UTIL.readForm(addForm);
+        if (!data.name) {
+          window.UTIL.toast('Falta el nombre del producto');
+          return;
+        }
+        var payload = {
+          name:                          data.name,
+          brand:                         data.brand || null,
+          affects_dkh_per_ml_per_100l:   data.affects_dkh_per_ml_per_100l || 0,
+          affects_ca_per_ml_per_100l:    data.affects_ca_per_ml_per_100l  || 0,
+          affects_mg_per_ml_per_100l:    data.affects_mg_per_ml_per_100l  || 0,
+          default_mode:                  data.default_mode || 'daily',
+          notes:                         data.notes || null
+        };
+        window.API.insertProduct(payload).then(function () {
+          window.UTIL.toast('Producto añadido');
+          addForm.reset();
+          reloadProductsAndRender();
+        })['catch'](function (err) {
+          window.UTIL.toast('Error: ' + err.message);
+        });
+      });
+    }
+  }
+
+  function openEditProductModal(product, aquarium) {
+    var overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML =
+      '<div class="modal">' +
+        '<h2>Editar producto</h2>' +
+        '<form id="modal-edit-product" autocomplete="off">' +
+          '<div class="grid">' +
+            '<label>Marca<input type="text" name="brand" value="' + window.UTIL.escapeHtml(product.brand || '') + '"></label>' +
+            '<label>Nombre<input type="text" name="name" value="' + window.UTIL.escapeHtml(product.name) + '" required></label>' +
+          '</div>' +
+          '<p class="muted small">Concentración en ppm que sube 1 ml de la solución preparada en 100 L.</p>' +
+          '<div class="grid">' +
+            '<label>+ dKH<input type="number" step="0.001" name="affects_dkh_per_ml_per_100l" value="' + (product.affects_dkh_per_ml_per_100l || 0) + '" inputmode="decimal"></label>' +
+            '<label>+ Ca<input type="number" step="0.01" name="affects_ca_per_ml_per_100l" value="' + (product.affects_ca_per_ml_per_100l || 0) + '" inputmode="decimal"></label>' +
+            '<label>+ Mg<input type="number" step="0.01" name="affects_mg_per_ml_per_100l" value="' + (product.affects_mg_per_ml_per_100l || 0) + '" inputmode="decimal"></label>' +
+          '</div>' +
+          '<label class="full">Modo<select name="default_mode">' +
+            '<option value="daily"'     + (product.default_mode === 'daily'     ? ' selected' : '') + '>Diario</option>' +
+            '<option value="on_demand"' + (product.default_mode === 'on_demand' ? ' selected' : '') + '>Eventual</option>' +
+          '</select></label>' +
+          '<label class="full">Notas<textarea name="notes" rows="3">' + window.UTIL.escapeHtml(product.notes || '') + '</textarea></label>' +
+          '<div class="modal-actions">' +
+            '<button type="button" class="btn-secondary" id="modal-product-cancel">Cancelar</button>' +
+            '<button type="submit">Guardar</button>' +
+          '</div>' +
+          '<div class="modal-error" id="modal-product-error"></div>' +
+        '</form>' +
+      '</div>';
+    document.body.appendChild(overlay);
+
+    overlay.querySelector('#modal-product-cancel').addEventListener('click', function () {
+      document.body.removeChild(overlay);
+    });
+
+    overlay.querySelector('#modal-edit-product').addEventListener('submit', function (e) {
+      e.preventDefault();
+      var data = window.UTIL.readForm(e.target);
+      var patch = {
+        name:                          data.name,
+        brand:                         data.brand || null,
+        affects_dkh_per_ml_per_100l:   data.affects_dkh_per_ml_per_100l || 0,
+        affects_ca_per_ml_per_100l:    data.affects_ca_per_ml_per_100l  || 0,
+        affects_mg_per_ml_per_100l:    data.affects_mg_per_ml_per_100l  || 0,
+        default_mode:                  data.default_mode || 'daily',
+        notes:                         data.notes || null
+      };
+      window.API.updateProduct(product.id, patch).then(function () {
+        document.body.removeChild(overlay);
+        window.UTIL.toast('Producto actualizado');
+        reloadProductsAndRender();
+      })['catch'](function (err) {
+        overlay.querySelector('#modal-product-error').textContent = 'Error: ' + err.message;
+      });
+    });
+  }
+
+  function reloadProductsAndRender() {
+    window.API.listProducts().then(function (products) {
+      window.STATE.setProducts(products || []);
+      render();
+    });
   }
 })();

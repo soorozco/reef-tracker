@@ -55,11 +55,12 @@
     Promise.all([
       window.API.listTasks(aquarium.id),
       window.API.listLastDonePerTask(aquarium.id),
-      window.API.listMaintenance(aquarium.id, 30)
+      window.API.listMaintenance(aquarium.id, 500)
     ]).then(function (results) {
       var tasks      = results[0] || [];
       var doneRows   = results[1] || [];
-      var logEntries = results[2] || [];
+      var allLog     = results[2] || [];
+      var logRecent  = allLog.slice(0, 30);
 
       var lastDoneByTask = {};
       doneRows.forEach(function (r) {
@@ -76,10 +77,12 @@
         html += renderAddTaskCard();
       }
       html += renderQuickLogCard();
-      html += renderLogListCard(logEntries, tasks);
+      html += renderStatsCard(allLog, tasks);
+      html += renderLogListCard(logRecent, tasks);
 
       container.innerHTML = html;
       bindHandlers(aquarium.id, tasks);
+      bindStatsHandlers(allLog, tasks);
     })['catch'](function (err) {
       container.innerHTML = '<div class="card"><p class="muted">Error: ' +
         window.UTIL.escapeHtml(err.message) + '</p></div>';
@@ -166,6 +169,100 @@
         '<button type="submit">Guardar entrada</button>' +
       '</form>' +
     '</div>';
+  }
+
+  // ----------------------------------------------------------
+  // Card: histórico agregado (totales por período)
+  // ----------------------------------------------------------
+  // periodKey: 'this_month' | 'this_year' | 'all'
+  function renderStatsCard(allLog, tasks) {
+    return '<div class="card">' +
+      '<h2>Histórico agregado</h2>' +
+      '<div class="stats-period-selector">' +
+        '<label class="stats-period-label">Período' +
+          '<select id="stats-period">' +
+            '<option value="this_month">Este mes</option>' +
+            '<option value="this_year" selected>Este año</option>' +
+            '<option value="all">Todo</option>' +
+          '</select>' +
+        '</label>' +
+      '</div>' +
+      '<div id="stats-content">' + renderStats(allLog, tasks, 'this_year') + '</div>' +
+    '</div>';
+  }
+
+  function renderStats(allLog, tasks, periodKey) {
+    var startMs = computePeriodStart(periodKey);
+    var taskById = {};
+    tasks.forEach(function (t) { taskById[t.id] = t; });
+
+    var stats = {};
+    allLog.forEach(function (e) {
+      if (startMs && new Date(e.performed_at).getTime() < startMs) return;
+      var name = e.task_id && taskById[e.task_id] ? taskById[e.task_id].name : '(libre)';
+      if (!stats[name]) stats[name] = { count: 0, totals: {}, fieldLabels: {} };
+      stats[name].count++;
+      if (e.details && typeof e.details === 'object') {
+        var promptFields = (e.task_id && taskById[e.task_id] && taskById[e.task_id].prompt_fields) || [];
+        var labelMap = {};
+        promptFields.forEach(function (f) { labelMap[f.name] = f.label; });
+
+        for (var k in e.details) {
+          if (!e.details.hasOwnProperty(k)) continue;
+          var v = e.details[k];
+          if (typeof v === 'number') {
+            stats[name].totals[k] = (stats[name].totals[k] || 0) + v;
+            if (labelMap[k]) stats[name].fieldLabels[k] = labelMap[k];
+          }
+        }
+      }
+    });
+
+    var keys = Object.keys(stats).sort(function (a, b) { return stats[b].count - stats[a].count; });
+    if (keys.length === 0) {
+      return '<p class="muted">Sin actividad registrada en este período.</p>';
+    }
+    return keys.map(function (name) {
+      var s = stats[name];
+      var totalsHtml = '';
+      var totalKeys = Object.keys(s.totals);
+      if (totalKeys.length > 0) {
+        var parts = totalKeys.map(function (k) {
+          var label = s.fieldLabels[k] || k;
+          var val = s.totals[k];
+          return '<span class="stats-total"><strong>' + window.UTIL.escapeHtml(label) + ':</strong> ' +
+            (val % 1 === 0 ? val : val.toFixed(2)) + '</span>';
+        });
+        totalsHtml = '<div class="stats-totals">' + parts.join(' · ') + '</div>';
+      }
+      return '<div class="stats-row">' +
+        '<div class="stats-row-top">' +
+          '<span class="stats-name">' + window.UTIL.escapeHtml(name) + '</span>' +
+          '<span class="stats-count">' + s.count + ' vez' + (s.count === 1 ? '' : 'es') + '</span>' +
+        '</div>' +
+        totalsHtml +
+      '</div>';
+    }).join('');
+  }
+
+  function computePeriodStart(periodKey) {
+    var now = new Date();
+    if (periodKey === 'this_month') {
+      return new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+    }
+    if (periodKey === 'this_year') {
+      return new Date(now.getFullYear(), 0, 1).getTime();
+    }
+    return null;
+  }
+
+  function bindStatsHandlers(allLog, tasks) {
+    var sel = document.getElementById('stats-period');
+    if (!sel) return;
+    sel.addEventListener('change', function () {
+      var content = document.getElementById('stats-content');
+      content.innerHTML = renderStats(allLog, tasks, sel.value);
+    });
   }
 
   // ----------------------------------------------------------
