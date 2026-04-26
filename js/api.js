@@ -76,8 +76,21 @@
       var l = limit || 20;
       return request('GET', '/solutions?aquarium_id=eq.' + aquariumId + '&order=prepared_at.desc&limit=' + l);
     },
+    // Último lote por canal: trae los lotes con channel_number no nulo,
+    // ordenados desc. El frontend agrupa para quedarse con el más reciente
+    // por canal.
+    listLatestSolutionsByChannel: function (aquariumId) {
+      return request('GET',
+        '/solutions?aquarium_id=eq.' + aquariumId +
+        '&channel_number=not.is.null' +
+        '&select=id,product_id,product_name,powder_grams,rodi_ml,prepared_at,channel_number,notes' +
+        '&order=prepared_at.desc');
+    },
     insertSolution: function (row) {
       return request('POST', '/solutions', row);
+    },
+    deleteSolution: function (id) {
+      return request('DELETE', '/solutions?id=eq.' + id);
     },
 
     // ---------------- Maintenance log ----------------
