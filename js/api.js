@@ -2,13 +2,23 @@
 // Compatible con Safari 9 (iOS 9.3.5) — no usa fetch ni async/await.
 
 (function () {
+  // Devuelve el token de autorización a usar:
+  //   - access_token del usuario si hay sesión activa
+  //   - anon key si no hay sesión (usa solo para login screen)
+  function getAuthToken() {
+    if (window.AUTH && window.AUTH.isAuthenticated()) {
+      return window.AUTH.getAccessToken();
+    }
+    return window.CONFIG.SUPABASE_ANON_KEY;
+  }
+
   function request(method, path, body, extraHeaders) {
     return new Promise(function (resolve, reject) {
       var xhr = new XMLHttpRequest();
       var url = window.CONFIG.SUPABASE_URL + '/rest/v1' + path;
       xhr.open(method, url, true);
       xhr.setRequestHeader('apikey', window.CONFIG.SUPABASE_ANON_KEY);
-      xhr.setRequestHeader('Authorization', 'Bearer ' + window.CONFIG.SUPABASE_ANON_KEY);
+      xhr.setRequestHeader('Authorization', 'Bearer ' + getAuthToken());
       xhr.setRequestHeader('Content-Type', 'application/json');
       xhr.setRequestHeader('Prefer', 'return=representation');
       if (extraHeaders) {
@@ -21,6 +31,10 @@
           if (!xhr.responseText) { resolve(null); return; }
           try { resolve(JSON.parse(xhr.responseText)); }
           catch (e) { resolve(xhr.responseText); }
+        } else if (xhr.status === 401 && window.AUTH && window.AUTH.isAuthenticated()) {
+          // Token rechazado — limpiar sesión y forzar relogin
+          window.AUTH.signOut();
+          window.location.reload();
         } else {
           reject(new Error('HTTP ' + xhr.status + ': ' + xhr.responseText));
         }

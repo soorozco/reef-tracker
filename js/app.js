@@ -50,10 +50,26 @@
   // ----------------------------------------------------------
   document.addEventListener('DOMContentLoaded', function () {
     setupTabs();
+    setupLogoutButton();
     boot();
   });
 
   function boot() {
+    window.AUTH.init().then(function (session) {
+      if (!session || !window.AUTH.isAuthenticated()) {
+        showLoginScreen();
+        return;
+      }
+      hideLoginScreen();
+      renderUserBadge();
+      loadAppData();
+    })['catch'](function (err) {
+      showLoginScreen();
+      console.warn('Auth init error:', err);
+    });
+  }
+
+  function loadAppData() {
     window.STATE.loadCurrentAquariumId();
     Promise.all([
       window.API.listAquariums(),
@@ -94,6 +110,93 @@
     window.VIEW_SOLUTIONS.init();
     window.VIEW_DOSING.init();
     refreshActiveView();
+  }
+
+  // ----------------------------------------------------------
+  // Login screen
+  // ----------------------------------------------------------
+  function showLoginScreen() {
+    document.body.classList.add('logged-out');
+    var box = document.getElementById('login-screen');
+    box.style.display = 'flex';
+
+    var form = document.getElementById('login-form');
+    var emailInput = document.getElementById('login-email');
+    var statusEl = document.getElementById('login-status');
+    var btn = document.getElementById('login-btn');
+
+    // Pre-llenar con último email usado, si existe
+    try {
+      var last = localStorage.getItem('reef-tracker.last_email');
+      if (last) emailInput.value = last;
+    } catch (e) {}
+
+    form.onsubmit = function (e) {
+      e.preventDefault();
+      var email = emailInput.value.trim();
+      if (!email) {
+        statusEl.className = 'login-status error';
+        statusEl.textContent = 'Ingresa tu correo';
+        return;
+      }
+      btn.disabled = true;
+      btn.textContent = 'Enviando...';
+      statusEl.className = 'login-status';
+      statusEl.textContent = '';
+
+      window.AUTH.requestLogin(email).then(function () {
+        try { localStorage.setItem('reef-tracker.last_email', email); } catch (e) {}
+        statusEl.className = 'login-status success';
+        statusEl.innerHTML = '✓ Te envié un link a <strong>' + window.UTIL.escapeHtml(email) +
+          '</strong>. Revisa tu correo (incluye spam) y haz click. Esta pestaña ya puedes cerrarla.';
+        btn.disabled = false;
+        btn.textContent = 'Reenviar link';
+      })['catch'](function (err) {
+        statusEl.className = 'login-status error';
+        var msg = err.message || 'Error desconocido';
+        if (msg.toLowerCase().indexOf('signups not allowed') !== -1 ||
+            msg.toLowerCase().indexOf('not found') !== -1 ||
+            msg.toLowerCase().indexOf('signup is disabled') !== -1) {
+          statusEl.textContent = 'Este correo no tiene acceso. Pídele al admin que te invite.';
+        } else {
+          statusEl.textContent = 'Error: ' + msg;
+        }
+        btn.disabled = false;
+        btn.textContent = 'Enviar link';
+      });
+    };
+  }
+
+  function hideLoginScreen() {
+    document.body.classList.remove('logged-out');
+    var box = document.getElementById('login-screen');
+    if (box) box.style.display = 'none';
+  }
+
+  function renderUserBadge() {
+    var badge = document.getElementById('user-badge');
+    if (!badge) return;
+    var email = window.AUTH.getUserEmail() || '';
+    badge.innerHTML = '<span class="user-email" title="' + window.UTIL.escapeHtml(email) + '">' +
+      window.UTIL.escapeHtml(email) + '</span>' +
+      '<button id="logout-btn" type="button" title="Cerrar sesión">Salir</button>';
+    badge.style.display = 'flex';
+
+    var logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', function () {
+        if (!confirm('¿Cerrar sesión?')) return;
+        window.AUTH.signOut().then(function () {
+          window.location.reload();
+        });
+      });
+    }
+  }
+
+  function setupLogoutButton() {
+    // Logout se enlaza dinámicamente en renderUserBadge() porque el botón
+    // se crea ahí. Esta función queda como placeholder para futuras
+    // extensiones del header.
   }
 
   // ----------------------------------------------------------

@@ -13,7 +13,10 @@
   <header>
     <div class="header-top">
       <h1>Reef Tracker</h1>
-      <div id="aquarium-selector" class="aquarium-selector"></div>
+      <div class="header-right">
+        <div id="aquarium-selector" class="aquarium-selector"></div>
+        <div id="user-badge" class="user-badge"></div>
+      </div>
     </div>
     <nav>
       <button class="tab active" data-tab="parameters">Parámetros</button>
@@ -70,7 +73,22 @@
 
   <div id="toast" class="toast"></div>
 
+  <!-- Pantalla de login (oculta cuando hay sesión) -->
+  <div id="login-screen" class="login-overlay" style="display:none">
+    <div class="login-box">
+      <h1>Reef Tracker</h1>
+      <p class="muted">Ingresa tu correo y te enviaré un link mágico para entrar. Sin contraseñas.</p>
+      <form id="login-form" autocomplete="on">
+        <input type="email" id="login-email" name="email" placeholder="tu@email.com" required autocomplete="email">
+        <button id="login-btn" type="submit">Enviar link</button>
+      </form>
+      <div id="login-status" class="login-status"></div>
+      <p class="muted small login-help">¿Primera vez? El admin debe haberte invitado primero desde el dashboard de Supabase.</p>
+    </div>
+  </div>
+
   <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
   <script src="js/api.js"></script>
   <script src="js/state.js"></script>
   <script src="js/wizard.js"></script>
