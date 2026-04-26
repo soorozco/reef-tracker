@@ -1,6 +1,6 @@
 /* Reef Tracker — estilos.
    Optimizado para Safari 9 (iOS 9.3.5): flexbox con prefijos -webkit-,
-   sin CSS Grid moderno, sin gap en flex (usar márgenes en su lugar). */
+   sin CSS Grid moderno. */
 
 * { box-sizing: border-box; }
 
@@ -15,9 +15,7 @@ html, body {
   -webkit-font-smoothing: antialiased;
 }
 
-body {
-  min-height: 100vh;
-}
+body { min-height: 100vh; }
 
 /* ---------- Header ---------- */
 header {
@@ -30,16 +28,49 @@ header {
   z-index: 10;
 }
 
+.header-top {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+          align-items: center;
+  -webkit-justify-content: space-between;
+          justify-content: space-between;
+  margin-bottom: 10px;
+}
+
 header h1 {
-  margin: 0 0 10px 0;
+  margin: 0;
   font-size: 20px;
   font-weight: 600;
   color: #1fb8c4;
   letter-spacing: 0.5px;
 }
 
+.aquarium-selector {
+  font-size: 13px;
+  color: #8aa3b8;
+}
+
+.aquarium-selector .aq-name {
+  background: rgba(31,184,196,0.15);
+  color: #1fb8c4;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.aquarium-selector select {
+  background: rgba(31,184,196,0.15);
+  color: #1fb8c4;
+  border: 1px solid #1fb8c4;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 13px;
+  -webkit-appearance: none;
+  font-family: inherit;
+}
+
 nav {
-  display: -webkit-box;
   display: -webkit-flex;
   display: flex;
   -webkit-flex-wrap: wrap;
@@ -67,14 +98,19 @@ nav {
 }
 
 /* ---------- Layout ---------- */
-main {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 16px;
-}
+main { max-width: 800px; margin: 0 auto; padding: 16px; }
 
 .view { display: none; }
 .view.active { display: block; }
+
+.boot-error {
+  background: #5a1a1a;
+  color: #ffd3d3;
+  padding: 14px 18px;
+  border-radius: 8px;
+  margin: 12px;
+  font-size: 14px;
+}
 
 /* ---------- Card ---------- */
 .card {
@@ -86,10 +122,11 @@ main {
 }
 
 .card h2 { margin: 0 0 12px 0; font-size: 16px; color: #e8f1f8; }
-
 main h2 { font-size: 16px; margin: 16px 0 8px 0; color: #e8f1f8; }
 
 .muted { color: #8aa3b8; font-size: 14px; margin: 0; }
+.muted.small { font-size: 12px; }
+.small { font-size: 12px; }
 
 /* ---------- Form ---------- */
 .grid {
@@ -118,12 +155,12 @@ label.full {
   display: block;
   font-size: 12px;
   color: #8aa3b8;
-  margin: 6px 0 0 0;
+  margin: 6px 0 10px 0;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
-input, textarea {
+input, textarea, select {
   width: 100%;
   padding: 10px 12px;
   margin-top: 4px;
@@ -136,7 +173,9 @@ input, textarea {
   -webkit-appearance: none;
 }
 
-input:focus, textarea:focus {
+select { padding-right: 28px; }
+
+input:focus, textarea:focus, select:focus {
   outline: none;
   border-color: #1fb8c4;
 }
@@ -158,9 +197,7 @@ button[type="submit"] {
   width: 100%;
 }
 
-button[type="submit"]:active {
-  background: #17a3ae;
-}
+button[type="submit"]:active { background: #17a3ae; }
 
 /* ---------- Lista ---------- */
 .list { display: block; }
@@ -183,6 +220,17 @@ button[type="submit"]:active {
   font-size: 14px;
   word-wrap: break-word;
   word-break: break-word;
+}
+
+.param {
+  display: inline-block;
+  margin-right: 10px;
+  margin-bottom: 4px;
+}
+
+.param.off-target {
+  color: #ffaa6e;
+  font-weight: 600;
 }
 
 .item-notes {
@@ -216,6 +264,82 @@ button[type="submit"]:active {
   -webkit-transform: translateX(-50%) translateY(0);
           transform: translateX(-50%) translateY(0);
 }
+
+/* ---------- Wizard ---------- */
+.wizard-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(5,20,33,0.96);
+  z-index: 200;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 20px;
+}
+
+.wizard {
+  max-width: 600px;
+  margin: 20px auto;
+  background: #122a40;
+  border: 1px solid rgba(31,184,196,0.4);
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.wizard h2 {
+  margin: 0 0 4px 0;
+  color: #1fb8c4;
+  font-size: 22px;
+}
+
+.wizard fieldset {
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  padding: 12px;
+  margin: 16px 0;
+}
+
+.wizard legend {
+  padding: 0 8px;
+  font-size: 12px;
+  color: #1fb8c4;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+
+.wizard .channel-row {
+  margin-bottom: 8px;
+}
+
+.wizard-error {
+  margin-top: 10px;
+  color: #e85a5a;
+  font-size: 14px;
+}
+
+/* ---------- Configuración: canales ---------- */
+.channel-form {
+  background: rgba(0,0,0,0.15);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 10px;
+}
+
+.channel-header {
+  font-weight: 600;
+  color: #1fb8c4;
+  margin-bottom: 6px;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+}
+
+.product-row {
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.product-row:last-child { border-bottom: none; }
 
 /* ---------- Tablet/desktop ---------- */
 @media (min-width: 600px) {

@@ -31,36 +31,59 @@
   }
 
   window.API = {
-    // Parámetros
-    listParameters: function (limit) {
+    // ---------------- Aquariums ----------------
+    listAquariums: function () {
+      return request('GET', '/aquariums?order=created_at.asc');
+    },
+    insertAquarium: function (row) {
+      return request('POST', '/aquariums', row);
+    },
+    updateAquarium: function (id, patch) {
+      return request('PATCH', '/aquariums?id=eq.' + id, patch);
+    },
+
+    // ---------------- Products ----------------
+    listProducts: function () {
+      return request('GET', '/products?order=brand.asc,name.asc');
+    },
+
+    // ---------------- Dosing channels ----------------
+    listChannels: function (aquariumId) {
+      return request('GET', '/dosing_channels?aquarium_id=eq.' + aquariumId + '&order=channel_number.asc');
+    },
+    upsertChannel: function (row) {
+      return request('POST', '/dosing_channels', row, {
+        'Prefer': 'resolution=merge-duplicates,return=representation'
+      });
+    },
+    updateChannel: function (aquariumId, channelNumber, patch) {
+      return request('PATCH',
+        '/dosing_channels?aquarium_id=eq.' + aquariumId + '&channel_number=eq.' + channelNumber,
+        patch);
+    },
+
+    // ---------------- Parameters ----------------
+    listParameters: function (aquariumId, limit) {
       var l = limit || 20;
-      return request('GET', '/parameters?order=measured_at.desc&limit=' + l);
+      return request('GET', '/parameters?aquarium_id=eq.' + aquariumId + '&order=measured_at.desc&limit=' + l);
     },
     insertParameter: function (row) {
       return request('POST', '/parameters', row);
     },
 
-    // Canales de dosificación
-    listChannels: function () {
-      return request('GET', '/dosing_channels?order=id.asc');
-    },
-    updateChannel: function (id, patch) {
-      return request('PATCH', '/dosing_channels?id=eq.' + id, patch);
-    },
-
-    // Soluciones
-    listSolutions: function (limit) {
+    // ---------------- Solutions ----------------
+    listSolutions: function (aquariumId, limit) {
       var l = limit || 20;
-      return request('GET', '/solutions?order=prepared_at.desc&limit=' + l);
+      return request('GET', '/solutions?aquarium_id=eq.' + aquariumId + '&order=prepared_at.desc&limit=' + l);
     },
     insertSolution: function (row) {
       return request('POST', '/solutions', row);
     },
 
-    // Mantenimiento
-    listMaintenance: function (limit) {
+    // ---------------- Maintenance ----------------
+    listMaintenance: function (aquariumId, limit) {
       var l = limit || 20;
-      return request('GET', '/maintenance_log?order=performed_at.desc&limit=' + l);
+      return request('GET', '/maintenance_log?aquarium_id=eq.' + aquariumId + '&order=performed_at.desc&limit=' + l);
     },
     insertMaintenance: function (row) {
       return request('POST', '/maintenance_log', row);
