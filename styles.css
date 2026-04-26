@@ -1305,6 +1305,142 @@ button[type="submit"]:active { background: #17a3ae; }
 .stats-total { display: inline-block; margin-right: 8px; }
 .stats-total strong { color: #1fb8c4; font-weight: 600; }
 
+/* ---------- Plan programado (dosing schedule) ---------- */
+.schedule-toolbar {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-wrap: wrap;
+          flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.schedule-toolbar button {
+  background: #1fb8c4;
+  color: #051421;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin: 0 6px 6px 0;
+  width: auto;
+}
+
+.schedule-toolbar button.btn-secondary {
+  background: transparent;
+  color: #1fb8c4;
+  border: 1px solid #1fb8c4;
+}
+
+.schedule-section-title {
+  font-size: 13px;
+  margin: 14px 0 6px 0;
+  color: #8aa3b8;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.schedule-row {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+          align-items: center;
+  background: rgba(0,0,0,0.15);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-left: 3px solid #8aa3b8;
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin-bottom: 6px;
+}
+
+.schedule-row.schedule-pending { border-left-color: #1fb8c4; }
+.schedule-row.schedule-done    { border-left-color: #4ec98a; opacity: 0.85; }
+.schedule-row.schedule-skipped { border-left-color: #8aa3b8; opacity: 0.6; }
+
+.schedule-info { -webkit-flex: 1; flex: 1; min-width: 0; }
+
+.schedule-when {
+  font-size: 12px;
+  color: #8aa3b8;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+
+.schedule-what {
+  font-size: 14px;
+  color: #e8f1f8;
+}
+
+.schedule-what strong { color: #1fb8c4; }
+
+.schedule-notes,
+.schedule-done-info {
+  margin-top: 2px;
+}
+
+.schedule-actions {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+          align-items: center;
+  margin-left: 6px;
+}
+
+.btn-schedule-done {
+  background: #1fb8c4;
+  color: #051421;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-right: 4px;
+}
+
+.btn-schedule-done:active { background: #17a3ae; }
+.btn-schedule-done:disabled { opacity: 0.5; }
+
+.btn-schedule-skip,
+.btn-schedule-restore,
+.btn-schedule-delete {
+  background: transparent;
+  color: #8aa3b8;
+  border: 1px solid rgba(255,255,255,0.1);
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+  -webkit-appearance: none;
+  padding: 0;
+  margin-left: 3px;
+  line-height: 1;
+}
+
+.btn-schedule-delete:active {
+  background: rgba(232,90,90,0.2);
+  color: #e85a5a;
+  border-color: #e85a5a;
+}
+
+.btn-schedule-restore:active,
+.btn-schedule-skip:active {
+  background: rgba(31,184,196,0.15);
+  color: #1fb8c4;
+  border-color: #1fb8c4;
+}
+
+.schedule-list { display: block; }
+
 #login-btn {
   background: #1fb8c4;
   color: #051421;

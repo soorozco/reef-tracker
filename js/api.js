@@ -86,6 +86,30 @@
       return request('DELETE', '/livestock?id=eq.' + id);
     },
 
+    // ---------------- Dosing schedule (eventos programados) ----------------
+    listSchedule: function (aquariumId, statusFilter) {
+      var q = '/dosing_schedule?aquarium_id=eq.' + aquariumId + '&order=scheduled_at.asc';
+      if (statusFilter) q += '&status=eq.' + encodeURIComponent(statusFilter);
+      return request('GET', q);
+    },
+    insertSchedule: function (row) {
+      return request('POST', '/dosing_schedule', row);
+    },
+    insertScheduleBulk: function (rows) {
+      return request('POST', '/dosing_schedule', rows);
+    },
+    updateSchedule: function (id, patch) {
+      return request('PATCH', '/dosing_schedule?id=eq.' + id, patch);
+    },
+    deleteSchedule: function (id) {
+      return request('DELETE', '/dosing_schedule?id=eq.' + id);
+    },
+    deleteScheduleBulk: function (aquariumId, statusFilter) {
+      var q = '/dosing_schedule?aquarium_id=eq.' + aquariumId;
+      if (statusFilter) q += '&status=eq.' + encodeURIComponent(statusFilter);
+      return request('DELETE', q);
+    },
+
     // ---------------- Dosing channels ----------------
     listChannels: function (aquariumId) {
       return request('GET', '/dosing_channels?aquarium_id=eq.' + aquariumId + '&order=channel_number.asc');
