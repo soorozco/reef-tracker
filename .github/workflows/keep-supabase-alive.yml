@@ -1,0 +1,35 @@
+name: Keep Supabase alive
+
+# Hace una request diaria a la API REST de Supabase para evitar que el
+# proyecto se pause por inactividad (free tier pausa después de ~7 días
+# sin tráfico). Una request es suficiente para reiniciar el contador.
+#
+# La anon key y la URL son públicas por diseño (van también en el cliente
+# en js/config.js), por eso no se manejan como GitHub secrets.
+
+on:
+  schedule:
+    # Diario a las 12:00 UTC (06:00 hora México). Mucho margen contra los 7 días.
+    - cron: '0 12 * * *'
+  workflow_dispatch:  # Permite ejecutar manualmente desde la pestaña Actions
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase REST
+        run: |
+          URL="https://xeytqpievzjncfylbfsd.supabase.co/rest/v1/aquariums?select=id&limit=1"
+          KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhleXRxcGlldnpqbmNmeWxiZnNkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwNzA3MzUsImV4cCI6MjA5MjY0NjczNX0.Y1FMHMHJ-vndxVPr8vkY93jUr97NMsUUOwquHrZYXPo"
+          response=$(curl -s -o /tmp/body -w "%{http_code}" -H "apikey: $KEY" "$URL")
+          echo "HTTP $response"
+          cat /tmp/body || true
+          echo
+          # 2xx = OK, 401 = RLS bloquea anon (esperado tras la migración 006), 4xx = la API respondió
+          # Cualquier respuesta válida del servidor cuenta como "vivo".
+          if [ "$response" -ge 200 ] && [ "$response" -lt 500 ]; then
+            echo "✓ Supabase está vivo (HTTP $response)"
+            exit 0
+          fi
+          echo "✗ Supabase no respondió (HTTP $response). Probablemente esté pausado — ve al dashboard y revísalo."
+          exit 1
