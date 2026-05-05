@@ -32,7 +32,7 @@
       var channels = results[1] || [];
       var schedule = results[2] || [];
 
-      var consumption = computeConsumption(readings, channels, aquarium);
+      var consumption = computeConsumption(readings, channels, aquarium, schedule);
       var suggestions = computeSuggestions(consumption, channels);
 
       var html = '';
@@ -448,10 +448,14 @@
   // Cálculo: consumo real por parámetro
   // ----------------------------------------------------------
   // Para cada parámetro:
-  //   caída_aparente = (lectura_anterior - lectura_reciente) / días entre ambas
-  //   aporte_diario  = Σ ml_per_day_canal × E × 100 / V_total   (solo canales daily con producto)
-  //   consumo_real   = caída_aparente + aporte_diario
-  function computeConsumption(readings, channels, aquarium) {
+  //   caída_aparente   = (lectura_anterior - lectura_reciente) / días entre ambas
+  //   aporte_constante = Σ ml_per_day_canal × E × 100 / V_total
+  //                      (solo canales daily con producto)
+  //   aporte_manual    = Σ ml_dose × E × 100 / V_total
+  //                      (dosis del Plan programado con status='done' y done_at
+  //                       entre las dos lecturas) / días
+  //   consumo_real     = caída_aparente + aporte_constante + aporte_manual
+  function computeConsumption(readings, channels, aquarium, schedule) {
     var totalVolL = (Number(aquarium.display_volume_l) || 0) +
                     (Number(aquarium.sump_volume_l) || 0);
 
@@ -502,18 +506,40 @@
         });
       });
 
-      var realConsumption = apparentDrop + dailyContribution;
+      // Aporte de dosis manuales del Plan programado entre las dos lecturas
+      var manualContributionTotal = 0;
+      var manualDosesCount = 0;
+      var recentMs   = new Date(recent.measured_at).getTime();
+      var previousMs = new Date(previous.measured_at).getTime();
+      (schedule || []).forEach(function (s) {
+        if (s.status !== 'done' || !s.done_at) return;
+        var doneMs = new Date(s.done_at).getTime();
+        if (doneMs <= previousMs || doneMs > recentMs) return;
+        var p = s.product_id ? window.STATE.findProductById(s.product_id) : null;
+        if (!p) return;
+        var effect = Number(p['affects_' + param + '_per_ml_per_100l']) || 0;
+        if (effect <= 0) return;
+        var ml = (s.done_ml !== null && s.done_ml !== undefined) ? Number(s.done_ml) : Number(s.ml);
+        if (!ml || ml <= 0 || totalVolL <= 0) return;
+        manualContributionTotal += ml * effect * (100 / totalVolL);
+        manualDosesCount++;
+      });
+      var manualPerDay = daysBetween > 0 ? (manualContributionTotal / daysBetween) : 0;
+
+      var realConsumption = apparentDrop + dailyContribution + manualPerDay;
 
       out.data[param] = {
         hasData: true,
-        recentValue:    Number(recent[param]),
-        previousValue:  Number(previous[param]),
-        recentDate:     recent.measured_at,
-        previousDate:   previous.measured_at,
-        daysBetween:    daysBetween,
-        apparentDrop:   apparentDrop,
-        dailyContribution: dailyContribution,
-        realConsumption: realConsumption,
+        recentValue:        Number(recent[param]),
+        previousValue:      Number(previous[param]),
+        recentDate:         recent.measured_at,
+        previousDate:       previous.measured_at,
+        daysBetween:        daysBetween,
+        apparentDrop:       apparentDrop,
+        dailyContribution:  dailyContribution,
+        manualPerDay:       manualPerDay,
+        manualDosesCount:   manualDosesCount,
+        realConsumption:    realConsumption,
         contributingChannels: contributingChannels
       };
     });
@@ -643,8 +669,14 @@
             return 'Ch' + c.channelNumber;
           }).join(', ');
           html += '<div class="consumption-detail muted small">' +
-            'Aporte actual de la bomba: +' + d.dailyContribution.toFixed(dec) +
+            'Aporte constante (bomba): +' + d.dailyContribution.toFixed(dec) +
             ' ' + unit + '/día (' + chList + ')</div>';
+        }
+
+        if (d.manualPerDay > 0) {
+          html += '<div class="consumption-detail muted small">' +
+            'Aporte manual (' + d.manualDosesCount + ' dosis): +' +
+            d.manualPerDay.toFixed(dec) + ' ' + unit + '/día</div>';
         }
 
         var realAbs = Math.abs(d.realConsumption).toFixed(dec);
